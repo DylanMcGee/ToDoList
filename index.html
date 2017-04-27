@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>So Many Awesome Things To Do</title>
+	<link rel='stylesheet' type='text/css' href='myStyle.css'>
+	<!-- <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'> -->
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</head>
+
+<body>
+	<div class='container' id='primaryContainer'>
+		<div class='row'>
+			<div class='col-lg-12'>
+				<img src='banner.png'></img>
+			</div>
+		</div>
+		<br/>
+		<div class='row'> 
+			<div class='col-lg-10'> <span class="caret"></span></div>
+
+			<div class='col-lg-2'>
+				<button class = 'btn-block' id='saveCurrentList'>Save</button>
+			</div>
+		</div>
+
+		<div class='row'>
+			<div class='col-lg-10'></div>
+			<div class='col-lg-2'>
+				<button class='btn-block' id='loadSavedList'>Load</button>
+			</div>
+		</div>
+		<div class='row'>
+			<div class='col-lg-8'>
+				<input id='newItemInput' placeholder="Add a new task"></input>
+			</div>
+			<div class='col-lg-1'>
+				<button class='btn-block' id='addNewItemSubmit'>Add</button>
+			</div>
+		</div>
+
+
+		<span id='toDoList'>
+
+		</span>
+
+
+	</div>
+
+
+
+
+	<script type='text/javascript' src="jQuery-library.js"></script>
+	<script>
+	var taskArray = [];
+	var currentTask = {};
+
+
+	
+	$('#addNewItemSubmit').on('click', function(e){
+		
+		if($('#newItemInput').val() == ""){
+			//if user didn't enter anything, does not create a new item
+			console.log('no task was listed, did not add anything');
+		}
+		else{
+			//adds task to taskArray, sets isComplete to false.  initializes currentTask again
+			currentTask.description = $('#newItemInput').val();
+			currentTask.isComplete = false;
+			taskArray.push(currentTask);
+			currentTask={};
+
+			//displays currentTask in todolist div
+			$('#toDoList').html('');
+
+			for(var i=0; i<taskArray.length; i++){
+				newDiv = "";
+				newDiv += "<div class='row toDoItem ";
+				if(taskArray[i].isComplete == false){
+					newDiv += "incomplete'>";
+				}
+				else{
+					newDiv += "complete'>";
+				}
+
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
+				newDiv += "<div class='col-lg-7 taskDescription'>";
+
+				newDiv += taskArray[i].description + "</div>";
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
+
+				console.log(newDiv);
+
+				$('#toDoList').append(newDiv);
+
+			}
+		} 
+	});
+
+
+	$(document).on('click','.dm_checkmark',function(e){
+    console.log('checkity clickity');
+    elementNumber = $(this).parent().parent().index(); //this figures out which checkmark was clicked, 0 indexed
+
+    if(taskArray[elementNumber].isComplete){
+    	taskArray[elementNumber].isComplete = false;
+    } else{
+    	taskArray[elementNumber].isComplete = true;
+    }
+    
+
+
+    				$('#toDoList').html('');
+
+			for(var i=0; i<taskArray.length; i++){
+				newDiv = "";
+				newDiv += "<div class='row toDoItem ";
+				if(taskArray[i].isComplete == false){
+					newDiv += "incomplete'>";
+				}
+				else{
+					newDiv += "complete'>";
+				}
+
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
+				newDiv += "<div class='col-lg-7 taskDescription'>";
+
+				newDiv += taskArray[i].description + "</div>";
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
+
+				console.log(newDiv);
+
+				$('#toDoList').append(newDiv);
+
+			}
+
+
+
+    	/*	$('#toDoList').html('');
+
+			for(var i=0; i<taskArray.length; i++){
+				newDiv = "";
+				newDiv += "<div class='row toDoItem'>";
+
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
+				newDiv += "<div class='col-lg-7 ";
+				if(taskArray[i].isComplete == false){
+					newDiv += "incomplete'>";
+				}
+				else{
+					newDiv += "complete'>";
+				}
+				newDiv += taskArray[i].description + "</div>";
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
+
+				console.log(newDiv);
+
+				$('#toDoList').append(newDiv);
+
+			}
+
+
+	*/
+
+
+
+
+
+
+	});
+
+	$(document).on('click','.dm_trash',function(e){
+    console.log('trash clicked');
+	});
+
+
+	</script>
+</body>
+
+
+</html>

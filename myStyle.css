@@ -1,0 +1,31 @@
+#primaryContainer{
+	background-color: lightgrey;
+}
+#newItemInput{
+	width: 100%;
+	margin-bottom: 25px;
+	font-size: 2em;
+}
+.toDoItem{
+	font-size: 2.5em;
+}
+#addNewItemSubmit{
+	font-size: 1.8em;
+}
+.dm_checkmark{
+	font-size: .8em;
+}
+.dm_trash{
+	font-size: .8em;
+}
+.toDoItem:hover{
+	border: solid;
+	border-width: 1px;
+}
+.toDoItem .complete {
+	text-decoration: line-through;
+
+}
+.complete .taskDescription{
+	text-decoration: line-through;
+}
