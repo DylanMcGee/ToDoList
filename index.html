@@ -1,52 +1,109 @@
 <!DOCTYPE html>
 <html>
+<!--
+STILL TO DO:::
+
+1) Make lists override each other if the same name is chosen as before ** Done
+2) User can press Enter instead of clicking "add" button for faster input **done
+3) The new task input clears itself and puts back placeholder each time the 'add' button is pressed **done
+4) Make website look nicer 
+	a) jumbotron title and remove the current banner **done 5/2
+	b) style buttons / inputs 
+	c)background color **done 5/2
+	
+******Out of Original Scope Additions - Can add in later if revisiting project but not necessary
+5) File Manager - Allow user to delete lists that they no longer want
+6) Import/Export - If this is going to actually be in use, user should have ability to save their list as a txt file which you can import
+-->
 
 <head>
 	<title>So Many Awesome Things To Do</title>
-	<link rel='stylesheet' type='text/css' href='myStyle.css'>
+	
 	<!-- <link rel='stylesheet' type='text/css' href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.0.0-alpha.6/css/bootstrap.min.css'> -->
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+	<link rel='stylesheet' type='text/css' href='myStyle.css'>
 </head>
 
 <body>
-	<div class='container' id='primaryContainer'>
-		<div class='row'>
-			<div class='col-lg-12'>
-				<img src='banner.png'></img>
+	<div class = 'container' id='primaryContainer'>
+		<div class='jumbotron'>
+			<div class='row'>
+				<div class='col-lg-2'>
+				</div>
+				<div class='col-lg-10'>
+					<h1>So Much To <span id='titleVerb'>Do</span></h1>
+				</div>
+			</div>
+			<div class='row'>
+				<div class='col-lg-1'>
+				</div>
+				<div class='col-lg-3'>
+					<h3>&bull; Create Lists</h3>
+				</div>
+				<div class='col-lg-3'>
+					<h3>&bull; Track Progress</h3>
+				</div>
+				<div class='col-lg-5'>
+					<h3>&bull; Archive Accomplishments</h3>
+				</div>
+
+
+				
 			</div>
 		</div>
+		
+
 		<br/>
-		<div class='row'> 
-			<div class='col-lg-10'> <span class="caret"></span></div>
-
-			<div class='col-lg-2'>
-				<button class = 'btn-block' id='saveCurrentList'>Save</button>
-			</div>
-		</div>
-
+		<form id='addNewItemSubmit'>
 		<div class='row'>
-			<div class='col-lg-10'></div>
-			<div class='col-lg-2'>
-				<button class='btn-block' id='loadSavedList'>Load</button>
+			<div class='col-lg-1'>
 			</div>
-		</div>
-		<div class='row'>
+			
 			<div class='col-lg-8'>
-				<input id='newItemInput' placeholder="Add a new task"></input>
+				<input id='newItemInput' placeholder="Add a new task" autocomplete='off'></input>
 			</div>
 			<div class='col-lg-1'>
-				<button class='btn-block' id='addNewItemSubmit'>Add</button>
+				<button type='submit' class='btn-block' >Add</button>
+			</div>
+		</form>
+			<div class='col-lg-2'>
 			</div>
 		</div>
+		
 
 
-		<span id='toDoList'>
+		<div id='toDoList'>
 
-		</span>
+		</div>
 
+		<!-- SAVE BUTTON ROW -->
+		<div class='row'> 
+			<div class='col-lg-3'></div>
+			<div class='col-lg-2'>
+				<input id='saveInput' class='btn-block' placeholder = 'Save List As'></input>
+			</div>
+			<div class='col-lg-2'>
+				<button class = 'btn-block' id='saveCurrentList'>Save As</button>
+				<span id='savePopup'></span>
+			</div>
+			<div class='col-lg-5'>
+				
+			</div>
+		</div>
+		<!-- LOAD BUTTON ROW -->
+		<div class='row'>
+			<div class='col-lg-3'></div>
+			<div class='col-lg-2'>
+				<select type='text' class = 'btn-block' id='loadListsInput' placeholder='Load a Previously Saved List'></select>
+			</div>
+			<div class='col-lg-2'>
+				<button class='btn-block' id='loadListButton'>Load</button>
+			</div>
+			<div class='col-lg-5'></div>
+		</div>
 
-	</div>
-
+		
+	</>
 
 
 
@@ -55,13 +112,105 @@
 	var taskArray = [];
 	var currentTask = {};
 
+	var RefreshListOnFrontEnd = function(target, array){
+
+		$(target).html('');
+
+		for(var i=0; i<array.length; i++){
+				newDiv = "";
+				newDiv += "<div class='row toDoItem ";
+				if(array[i].isComplete == false){
+					newDiv += "incomplete'>";
+				}
+				else{
+					newDiv += "complete'>";
+				}
+
+				newDiv += "<div class='col-lg-1'></div><div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
+				newDiv += "<div class='col-lg-7 taskDescription'>";
+
+				newDiv += array[i].description + "</div>";
+				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
+
+		
+
+				$(target).append(newDiv);
+			}
+
+
+	}
+
+	var saveToLocalStorage = function(arrayOfTasks, listName){
+
+
+		//localStorage.toDoStorage.lists.push(arrayOfTasks);
+
+		existingLists = JSON.parse(localStorage.toDoStorageLists);
+
+
+
+		
+
+		newObject = {};
+		newObject.name = listName;
+		newObject.tasks = arrayOfTasks;
+
+		existingLists.push(newObject);
+
+
+		localStorage.setItem('toDoStorageLists' , JSON.stringify(existingLists));
+		refreshLoadList();
+
+		
+
+		/*localStorage['toDoStorage.lists'].clear();
+
+
+		localStorage['toDoStorage.lists'] = JSON.stringify(existingLists); */
+
+	}
+
+	var overwriteSavedFile = function(listName, positionInLocalStorageArray){
+		existingLists = JSON.parse(localStorage.toDoStorageLists);
+
+		newObject = {};
+		newObject.name = listName;
+		newObject.tasks = taskArray;
+
+
+		existingLists[positionInLocalStorageArray] = newObject;
+		localStorage.setItem('toDoStorageLists' , JSON.stringify(existingLists));
+
+
+	}
+
+	//refreshes Load list every time a new list is added.  This function is also used to create the list on document ready, which is what the else statement is for
+	var refreshLoadList = function(){
+
+			if(localStorage.getItem('toDoStorageLists') !== null){
+				localStorageAsArray = JSON.parse(localStorage.toDoStorageLists);
+				$('#loadListsInput').html('');
+			
+				for(var i=0; i<localStorageAsArray.length; i++){
+					$('#loadListsInput').append($('<option>', {value: i, text : localStorageAsArray[i].name}));
+				}
+			}else{
+				$('#loadListsInput').append($('<option>', {value: null, text : 'Choose a List'}));
+			}
+
+	}
+
+
 
 	
-	$('#addNewItemSubmit').on('click', function(e){
+	$('#addNewItemSubmit').on('submit', function(e){
+
+		e.preventDefault();
+
+		
 		
 		if($('#newItemInput').val() == ""){
 			//if user didn't enter anything, does not create a new item
-			console.log('no task was listed, did not add anything');
 		}
 		else{
 			//adds task to taskArray, sets isComplete to false.  initializes currentTask again
@@ -71,107 +220,128 @@
 			currentTask={};
 
 			//displays currentTask in todolist div
-			$('#toDoList').html('');
+			
+			RefreshListOnFrontEnd('#toDoList', taskArray);
 
-			for(var i=0; i<taskArray.length; i++){
-				newDiv = "";
-				newDiv += "<div class='row toDoItem ";
-				if(taskArray[i].isComplete == false){
-					newDiv += "incomplete'>";
-				}
-				else{
-					newDiv += "complete'>";
-				}
-
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
-				newDiv += "<div class='col-lg-7 taskDescription'>";
-
-				newDiv += taskArray[i].description + "</div>";
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
-
-				console.log(newDiv);
-
-				$('#toDoList').append(newDiv);
-
-			}
 		} 
+
+		$('form').trigger('reset');
 	});
 
 
 	$(document).on('click','.dm_checkmark',function(e){
-    console.log('checkity clickity');
-    elementNumber = $(this).parent().parent().index(); //this figures out which checkmark was clicked, 0 indexed
 
-    if(taskArray[elementNumber].isComplete){
-    	taskArray[elementNumber].isComplete = false;
-    } else{
-    	taskArray[elementNumber].isComplete = true;
-    }
-    
+	    elementNumber = $(this).parent().parent().index(); //this figures out which checkmark was clicked, 0 indexed
 
+	    if(taskArray[elementNumber].isComplete){
+	    	taskArray[elementNumber].isComplete = false;
+	    } else{
+	    	taskArray[elementNumber].isComplete = true;
+	    }
 
-    				$('#toDoList').html('');
-
-			for(var i=0; i<taskArray.length; i++){
-				newDiv = "";
-				newDiv += "<div class='row toDoItem ";
-				if(taskArray[i].isComplete == false){
-					newDiv += "incomplete'>";
-				}
-				else{
-					newDiv += "complete'>";
-				}
-
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
-				newDiv += "<div class='col-lg-7 taskDescription'>";
-
-				newDiv += taskArray[i].description + "</div>";
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
-
-				console.log(newDiv);
-
-				$('#toDoList').append(newDiv);
-
-			}
-
-
-
-    	/*	$('#toDoList').html('');
-
-			for(var i=0; i<taskArray.length; i++){
-				newDiv = "";
-				newDiv += "<div class='row toDoItem'>";
-
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-check dm_checkmark'></span></div>";
-				newDiv += "<div class='col-lg-7 ";
-				if(taskArray[i].isComplete == false){
-					newDiv += "incomplete'>";
-				}
-				else{
-					newDiv += "complete'>";
-				}
-				newDiv += taskArray[i].description + "</div>";
-				newDiv += "<div class='col-lg-1'><span class='glyphicon glyphicon-trash dm_trash'></span></div></div>";
-
-				console.log(newDiv);
-
-				$('#toDoList').append(newDiv);
-
-			}
-
-
-	*/
-
-
-
-
+		RefreshListOnFrontEnd('#toDoList', taskArray);
 
 
 	});
 
 	$(document).on('click','.dm_trash',function(e){
-    console.log('trash clicked');
+
+    	elementNumber = $(this).parent().parent().index(); //this figures out which trashcan was clicked, 0 indexed
+
+    	taskArray.splice(elementNumber, 1);
+
+    	RefreshListOnFrontEnd('#toDoList', taskArray);
+
+
+
 	});
+
+	$('#saveCurrentList').on('click', function(){
+		//$('#savePopup').css('visibility', 'visible');
+		
+		
+		//If this is users first time using our site, initialize our storage fields
+		if(localStorage.getItem('toDoStorageLists') == null){
+			localStorage.setItem('toDoStorageLists', '[]');
+			
+		}
+		name = $('#saveInput').val();
+		existingLists = JSON.parse(localStorage.toDoStorageLists);
+		//CHECK TO SEE IF FILE EXISTS IN LOCAL STORAGE ALREADY, THAT WAY THE FILE IS PROMPTED TO BE OVERRIDDEN.  THIS WAY USER CAN LOAD/EDIT OLD LISTS AND SAVE OVER THEM
+		elementPosition = existingLists.map(function(x){
+			return x.name;
+		}).indexOf(name);
+
+
+		if(elementPosition == -1){
+			saveToLocalStorage(taskArray, name);	
+		}else{
+			//prompt user for overwrite, then overwrite/cancel
+			if(confirm('There is already a file named ' + name + '. Press OK to overwrite') == true){
+				//overwrite
+				overwriteSavedFile(name, elementPosition);
+			}else{
+				//do nothing, user did not wish to overwrite file
+			}
+		}
+
+
+
+		
+		
+
+
+	});
+
+	$('#loadListButton').on('click', function(){
+		if(localStorage.getItem('toDoStorageLists') == null){
+			alert('There are no lists to load.  Create and save a list first!');
+		}else{
+			localStorageAsArray = JSON.parse(localStorage.toDoStorageLists);
+			taskArray = localStorageAsArray[$('#loadListsInput').val()].tasks;
+			RefreshListOnFrontEnd('#toDoList', taskArray);
+
+			$('#saveInput').val(localStorageAsArray[$('#loadListsInput').val()].name);
+
+
+
+			
+		}
+
+	})
+
+	//CREATES THE LIST OF PREVIOUSLY SAVED FILES IN DROPDOWN MENU IN loadListsInput
+	$(document).ready(function(){
+		
+		refreshLoadList();
+		
+		verbList=[ 'Accomplish', 'Learn', 'Explore'];
+		var counter=0;
+		var $adjective = $('#titleVerb');
+
+		var loop = function(){
+			$adjective.fadeOut(3000, function(){
+				if(counter<verbList.length-1){
+					counter++;
+				}else{
+					counter=0;
+				}
+				$adjective.text(verbList[counter]);
+				$adjective.fadeIn(1000, function(){
+					loop();
+				})
+
+			})
+
+		}
+		loop();
+
+
+	});
+
+
+
+	//$("#userPokemonValue").append($('<option>', {value:i, text: (i+1) + " - " + pokemon[i].name}));
 
 
 	</script>
